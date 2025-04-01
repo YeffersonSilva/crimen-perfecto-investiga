@@ -79,16 +79,16 @@ const allCases = [
 
 const Casos = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [difficultyFilter, setDifficultyFilter] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("");
+  const [difficultyFilter, setDifficultyFilter] = useState("all");
+  const [categoryFilter, setCategoryFilter] = useState("all");
   
   // Filter cases based on search and filters
   const filteredCases = allCases.filter((caseItem: any) => {
     const matchesSearch = caseItem.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
                          caseItem.description.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesDifficulty = difficultyFilter === "" || caseItem.difficulty === difficultyFilter;
-    const matchesCategory = categoryFilter === "" || caseItem.category === categoryFilter;
+    const matchesDifficulty = difficultyFilter === "all" || caseItem.difficulty === difficultyFilter;
+    const matchesCategory = categoryFilter === "all" || caseItem.category === categoryFilter;
     
     return matchesSearch && matchesDifficulty && matchesCategory;
   });
@@ -131,7 +131,7 @@ const Casos = () => {
                     <SelectValue placeholder="Dificultad" />
                   </SelectTrigger>
                   <SelectContent className="bg-detective-medium border-detective-light">
-                    <SelectItem value="">Todas las dificultades</SelectItem>
+                    <SelectItem value="all">Todas las dificultades</SelectItem>
                     <SelectItem value="easy">Fácil</SelectItem>
                     <SelectItem value="medium">Medio</SelectItem>
                     <SelectItem value="hard">Difícil</SelectItem>
@@ -148,7 +148,7 @@ const Casos = () => {
                     <SelectValue placeholder="Categoría" />
                   </SelectTrigger>
                   <SelectContent className="bg-detective-medium border-detective-light">
-                    <SelectItem value="">Todas las categorías</SelectItem>
+                    <SelectItem value="all">Todas las categorías</SelectItem>
                     {categories.map((category) => (
                       <SelectItem key={category} value={category}>
                         {category}
@@ -178,8 +178,8 @@ const Casos = () => {
                 className="mt-4 border-detective-light text-white hover:bg-detective-light/10"
                 onClick={() => {
                   setSearchTerm("");
-                  setDifficultyFilter("");
-                  setCategoryFilter("");
+                  setDifficultyFilter("all");
+                  setCategoryFilter("all");
                 }}
               >
                 Limpiar filtros
