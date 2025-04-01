@@ -23,6 +23,9 @@ const Navbar = () => {
           <Link to="/casos" className="text-gray-300 hover:text-white transition-colors">
             Casos
           </Link>
+          <Link to="/dashboard" className="text-gray-300 hover:text-white transition-colors">
+            Dashboard
+          </Link>
           <Link to="/perfil" className="text-gray-300 hover:text-white transition-colors">
             Mi Perfil
           </Link>
