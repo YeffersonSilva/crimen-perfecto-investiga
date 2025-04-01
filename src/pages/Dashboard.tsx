@@ -87,6 +87,13 @@ const allCases = [
   },
 ];
 
+// Define types for difficulty labels
+type DifficultyMapping = {
+  easy: string;
+  medium: string;
+  hard: string;
+};
+
 const Dashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [difficultyFilter, setDifficultyFilter] = useState("all");
@@ -110,20 +117,22 @@ const Dashboard = () => {
   
   // Function to get difficulty label
   const getDifficultyLabel = (difficulty: string) => {
-    return {
+    const difficultyLabels: DifficultyMapping = {
       easy: "Fácil",
       medium: "Medio",
       hard: "Difícil",
-    }[difficulty as keyof typeof { easy: string; medium: string; hard: string }] || difficulty;
+    };
+    return difficultyLabels[difficulty as keyof DifficultyMapping] || difficulty;
   };
   
   // Function to get badge color based on difficulty
   const getDifficultyBadgeColor = (difficulty: string) => {
-    return {
+    const difficultyColors: DifficultyMapping = {
       easy: "bg-green-500 hover:bg-green-600",
       medium: "bg-yellow-500 hover:bg-yellow-600",
       hard: "bg-crimson hover:bg-crimson-dark",
-    }[difficulty as keyof typeof { easy: string; medium: string; hard: string }] || "bg-blue-500";
+    };
+    return difficultyColors[difficulty as keyof DifficultyMapping] || "bg-blue-500";
   };
   
   // Function to get status badge color
