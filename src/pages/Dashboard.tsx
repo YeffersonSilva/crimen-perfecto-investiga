@@ -1,15 +1,15 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AppLayout from "@/components/AppLayout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, Filter, Clock, Calendar, ChevronRight } from "lucide-react";
+import { Search, Clock, Calendar, ChevronRight, ThumbsUp, Eye, BookOpen, Filter, RefreshCw } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 // Mock data for cases
 const allCases = [
@@ -99,6 +99,24 @@ const Dashboard = () => {
   const [difficultyFilter, setDifficultyFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [viewMode, setViewMode] = useState<"card" | "table">("card");
+  const [currentPage, setCurrentPage] = useState(1);
+  const { toast } = useToast();
+  
+  const casesPerPage = 4;
+  
+  // Function to handle case interaction
+  const handleCaseInteraction = (caseId: string, interactionType: string) => {
+    // Simulate interaction tracking
+    console.log(`Case ${caseId} - ${interactionType}`);
+    toast({
+      title: "¡Acción registrada!",
+      description: interactionType === "like" 
+        ? "Has marcado este caso como favorito" 
+        : "Este caso ha sido añadido a tu lista de vistos",
+      variant: "default",
+    });
+  };
   
   // Filter cases based on search and filters
   const filteredCases = allCases.filter((caseItem: any) => {
@@ -111,6 +129,12 @@ const Dashboard = () => {
     
     return matchesSearch && matchesDifficulty && matchesCategory && matchesStatus;
   });
+  
+  // Pagination
+  const totalPages = Math.ceil(filteredCases.length / casesPerPage);
+  const indexOfLastCase = currentPage * casesPerPage;
+  const indexOfFirstCase = indexOfLastCase - casesPerPage;
+  const currentCases = filteredCases.slice(indexOfFirstCase, indexOfLastCase);
   
   // Get unique categories for filter
   const categories = [...new Set(allCases.map((caseItem: any) => caseItem.category))];
@@ -142,75 +166,120 @@ const Dashboard = () => {
       : "bg-gray-500 hover:bg-gray-600";
   };
   
+  // Reset filters
+  const handleResetFilters = () => {
+    setSearchTerm("");
+    setDifficultyFilter("all");
+    setCategoryFilter("all");
+    setStatusFilter("all");
+    setCurrentPage(1);
+    toast({
+      title: "Filtros restablecidos",
+      description: "Se han eliminado todos los filtros aplicados",
+      variant: "default",
+    });
+  };
+  
+  useEffect(() => {
+    // Reset to first page when filters change
+    setCurrentPage(1);
+  }, [searchTerm, difficultyFilter, categoryFilter, statusFilter]);
+  
   return (
     <AppLayout>
       <div className="bg-detective-dark py-8">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-white">Dashboard de Casos</h1>
+              <h1 className="text-3xl font-bold text-white">Mi Dashboard</h1>
               <p className="text-gray-400 mt-2">
-                Visualiza y gestiona todos los casos de investigación
+                Explora y gestiona tus casos de investigación favoritos
               </p>
             </div>
-            <div className="mt-4 md:mt-0">
+            <div className="mt-4 md:mt-0 flex gap-3">
               <Button asChild className="bg-crimson hover:bg-crimson-dark text-white">
                 <Link to="/casos">Ver todos los casos</Link>
               </Button>
             </div>
           </div>
           
-          {/* Statistics Cards */}
+          {/* Interactive Statistics Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <Card className="bg-detective-medium border-detective-light text-white">
+            <Card className="bg-detective-medium border-detective-light text-white hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer">
               <CardHeader className="pb-2">
                 <CardDescription className="text-gray-400">Total de Casos</CardDescription>
-                <CardTitle className="text-3xl">{allCases.length}</CardTitle>
+                <CardTitle className="text-3xl flex items-center gap-2">
+                  {allCases.length}
+                  <Badge className="ml-2 bg-blue-500">+2 nuevos</Badge>
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-sm text-gray-400">Casos disponibles</div>
+                <div className="text-sm text-gray-400">Casos disponibles para resolver</div>
               </CardContent>
             </Card>
             
-            <Card className="bg-detective-medium border-detective-light text-white">
+            <Card className="bg-detective-medium border-detective-light text-white hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer">
               <CardHeader className="pb-2">
                 <CardDescription className="text-gray-400">Casos Abiertos</CardDescription>
-                <CardTitle className="text-3xl">
+                <CardTitle className="text-3xl flex items-center">
                   {allCases.filter(c => c.status === "Abierto").length}
+                  <Badge className="ml-2 bg-green-500">Activos</Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-sm text-gray-400">En investigación</div>
+                <div className="text-sm text-gray-400">Esperando tu resolución</div>
               </CardContent>
             </Card>
             
-            <Card className="bg-detective-medium border-detective-light text-white">
+            <Card className="bg-detective-medium border-detective-light text-white hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer">
               <CardHeader className="pb-2">
                 <CardDescription className="text-gray-400">Casos Resueltos</CardDescription>
-                <CardTitle className="text-3xl">
+                <CardTitle className="text-3xl flex items-center">
                   {allCases.filter(c => c.status === "Resuelto").length}
+                  <Badge className="ml-2 bg-gray-500">Completados</Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-sm text-gray-400">Completados</div>
+                <div className="text-sm text-gray-400">Casos resueltos con éxito</div>
               </CardContent>
             </Card>
             
-            <Card className="bg-detective-medium border-detective-light text-white">
+            <Card className="bg-detective-medium border-detective-light text-white hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer">
               <CardHeader className="pb-2">
-                <CardDescription className="text-gray-400">Tiempo Promedio</CardDescription>
-                <CardTitle className="text-3xl">65 min</CardTitle>
+                <CardDescription className="text-gray-400">Nivel de Detective</CardDescription>
+                <CardTitle className="text-3xl">Principiante</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-sm text-gray-400">De resolución</div>
+                <div className="text-sm text-gray-400">Resuelve más casos para subir</div>
+                <div className="w-full bg-detective-dark rounded-full h-2 mt-2">
+                  <div className="bg-crimson h-2 rounded-full" style={{width: "25%"}}></div>
+                </div>
               </CardContent>
             </Card>
           </div>
           
           {/* Search and filters */}
-          <Card className="bg-detective-medium border-detective-light mb-8">
+          <Card className="bg-detective-medium border-detective-light mb-8 hover:shadow-lg transition-all duration-300">
             <CardHeader>
-              <CardTitle className="text-white">Filtrar Casos</CardTitle>
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-white">Filtrar Casos</CardTitle>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    className={`border-detective-light text-white ${viewMode === "card" ? "bg-detective-dark" : ""}`}
+                    onClick={() => setViewMode("card")}
+                  >
+                    <BookOpen className="h-4 w-4 mr-1" /> Tarjetas
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className={`border-detective-light text-white ${viewMode === "table" ? "bg-detective-dark" : ""}`}
+                    onClick={() => setViewMode("table")}
+                  >
+                    <Filter className="h-4 w-4 mr-1" /> Tabla
+                  </Button>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -271,113 +340,249 @@ const Dashboard = () => {
                   </SelectContent>
                 </Select>
               </div>
+              
+              {filteredCases.length === 0 && (
+                <Button 
+                  className="mt-4 bg-detective-dark text-white border-detective-light hover:bg-detective-light/20"
+                  onClick={handleResetFilters}
+                >
+                  <RefreshCw className="mr-2 h-4 w-4" /> Restablecer filtros
+                </Button>
+              )}
             </CardContent>
           </Card>
           
-          {/* Cases Table */}
-          <Card className="bg-detective-medium border-detective-light text-white">
-            <CardHeader>
-              <CardTitle>Listado de Casos</CardTitle>
-              <CardDescription className="text-gray-400">
-                {filteredCases.length} casos encontrados
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {filteredCases.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader className="bg-detective-dark">
-                      <TableRow>
-                        <TableHead className="text-gray-300">Título</TableHead>
-                        <TableHead className="text-gray-300">Categoría</TableHead>
-                        <TableHead className="text-gray-300">Dificultad</TableHead>
-                        <TableHead className="text-gray-300">Fecha</TableHead>
-                        <TableHead className="text-gray-300">Investigador</TableHead>
-                        <TableHead className="text-gray-300">Tiempo Est.</TableHead>
-                        <TableHead className="text-gray-300">Estado</TableHead>
-                        <TableHead className="text-gray-300 text-right">Acciones</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredCases.map((caseItem: any) => (
-                        <TableRow key={caseItem.id} className="border-detective-light hover:bg-detective-dark/50">
-                          <TableCell className="font-medium text-white">
-                            {caseItem.title}
-                          </TableCell>
-                          <TableCell>{caseItem.category}</TableCell>
-                          <TableCell>
-                            <Badge className={`${getDifficultyBadgeColor(caseItem.difficulty)}`}>
+          {/* Cases Display (Card or Table view) */}
+          {viewMode === "card" ? (
+            <div className="mb-8">
+              {currentCases.length > 0 ? (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {currentCases.map((caseItem: any) => (
+                      <Card key={caseItem.id} className="bg-detective-medium border-detective-light text-white hover:shadow-lg transition-all duration-300 overflow-hidden">
+                        <div 
+                          className="h-40 bg-cover bg-center" 
+                          style={{ backgroundImage: `url(${caseItem.imageUrl})` }}
+                        />
+                        <CardHeader className="pb-2">
+                          <div className="flex justify-between">
+                            <Badge className={getDifficultyBadgeColor(caseItem.difficulty)}>
                               {getDifficultyLabel(caseItem.difficulty)}
                             </Badge>
-                          </TableCell>
-                          <TableCell className="flex items-center">
-                            <Calendar className="mr-2 h-4 w-4 text-gray-400" />
-                            {caseItem.date}
-                          </TableCell>
-                          <TableCell>{caseItem.investigator}</TableCell>
-                          <TableCell className="flex items-center">
-                            <Clock className="mr-2 h-4 w-4 text-gray-400" />
-                            {caseItem.timeEstimate}
-                          </TableCell>
-                          <TableCell>
                             <Badge className={getStatusBadgeColor(caseItem.status)}>
                               {caseItem.status}
                             </Badge>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Button asChild size="sm" variant="ghost" className="text-blue-400 hover:text-blue-300 hover:bg-detective-dark">
-                              <Link to={`/investigacion/${caseItem.id}`}>
-                                Ver detalles
-                                <ChevronRight className="ml-1 h-4 w-4" />
-                              </Link>
+                          </div>
+                          <CardTitle className="text-xl mt-2">{caseItem.title}</CardTitle>
+                          <CardDescription className="text-gray-400">
+                            {caseItem.category}
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-sm text-gray-300 line-clamp-2">
+                            {caseItem.description}
+                          </p>
+                          <div className="flex items-center mt-4 text-sm text-gray-400">
+                            <Calendar className="mr-1 h-4 w-4" />
+                            <span>{caseItem.date}</span>
+                            <Clock className="ml-4 mr-1 h-4 w-4" />
+                            <span>{caseItem.timeEstimate}</span>
+                          </div>
+                        </CardContent>
+                        <CardFooter className="flex justify-between">
+                          <div className="flex gap-2">
+                            <Button 
+                              size="sm" 
+                              variant="ghost" 
+                              className="text-gray-300 hover:text-white hover:bg-detective-dark/50"
+                              onClick={() => handleCaseInteraction(caseItem.id, "like")}
+                            >
+                              <ThumbsUp className="h-4 w-4" />
                             </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                  
-                  <div className="mt-6">
-                    <Pagination>
-                      <PaginationContent>
-                        <PaginationItem>
-                          <PaginationPrevious href="#" />
-                        </PaginationItem>
-                        <PaginationItem>
-                          <PaginationLink href="#" isActive>1</PaginationLink>
-                        </PaginationItem>
-                        <PaginationItem>
-                          <PaginationLink href="#">2</PaginationLink>
-                        </PaginationItem>
-                        <PaginationItem>
-                          <PaginationLink href="#">3</PaginationLink>
-                        </PaginationItem>
-                        <PaginationItem>
-                          <PaginationNext href="#" />
-                        </PaginationItem>
-                      </PaginationContent>
-                    </Pagination>
+                            <Button 
+                              size="sm" 
+                              variant="ghost" 
+                              className="text-gray-300 hover:text-white hover:bg-detective-dark/50"
+                              onClick={() => handleCaseInteraction(caseItem.id, "view")}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </div>
+                          <Button asChild size="sm" className="bg-crimson hover:bg-crimson-dark text-white">
+                            <Link to={`/investigacion/${caseItem.id}`}>
+                              Investigar
+                              <ChevronRight className="ml-1 h-4 w-4" />
+                            </Link>
+                          </Button>
+                        </CardFooter>
+                      </Card>
+                    ))}
                   </div>
-                </div>
+                  
+                  {/* Pagination for card view */}
+                  {totalPages > 1 && (
+                    <div className="mt-6 flex justify-center">
+                      <Pagination>
+                        <PaginationContent>
+                          <PaginationItem>
+                            <PaginationPrevious 
+                              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                              className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                            />
+                          </PaginationItem>
+                          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                            <PaginationItem key={page}>
+                              <PaginationLink 
+                                onClick={() => setCurrentPage(page)}
+                                isActive={currentPage === page}
+                              >
+                                {page}
+                              </PaginationLink>
+                            </PaginationItem>
+                          ))}
+                          <PaginationItem>
+                            <PaginationNext 
+                              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                              className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                            />
+                          </PaginationItem>
+                        </PaginationContent>
+                      </Pagination>
+                    </div>
+                  )}
+                </>
               ) : (
-                <div className="text-center py-12">
+                <div className="text-center py-12 bg-detective-medium rounded-lg border border-detective-light">
                   <p className="text-gray-400 text-lg mb-4">No se encontraron casos que coincidan con los criterios de búsqueda.</p>
                   <Button 
                     variant="outline" 
                     className="border-detective-light text-white hover:bg-detective-light/10"
-                    onClick={() => {
-                      setSearchTerm("");
-                      setDifficultyFilter("all");
-                      setCategoryFilter("all");
-                      setStatusFilter("all");
-                    }}
+                    onClick={handleResetFilters}
                   >
+                    <RefreshCw className="mr-2 h-4 w-4" />
                     Limpiar filtros
                   </Button>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          ) : (
+            <Card className="bg-detective-medium border-detective-light text-white">
+              <CardHeader>
+                <CardTitle>Listado de Casos</CardTitle>
+                <CardDescription className="text-gray-400">
+                  {filteredCases.length} casos encontrados
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {currentCases.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader className="bg-detective-dark">
+                        <TableRow>
+                          <TableHead className="text-gray-300">Título</TableHead>
+                          <TableHead className="text-gray-300">Categoría</TableHead>
+                          <TableHead className="text-gray-300">Dificultad</TableHead>
+                          <TableHead className="text-gray-300">Fecha</TableHead>
+                          <TableHead className="text-gray-300">Tiempo Est.</TableHead>
+                          <TableHead className="text-gray-300">Estado</TableHead>
+                          <TableHead className="text-gray-300 text-right">Acciones</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {currentCases.map((caseItem: any) => (
+                          <TableRow key={caseItem.id} className="border-detective-light hover:bg-detective-dark/50">
+                            <TableCell className="font-medium text-white">
+                              {caseItem.title}
+                            </TableCell>
+                            <TableCell>{caseItem.category}</TableCell>
+                            <TableCell>
+                              <Badge className={`${getDifficultyBadgeColor(caseItem.difficulty)}`}>
+                                {getDifficultyLabel(caseItem.difficulty)}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="flex items-center">
+                              <Calendar className="mr-2 h-4 w-4 text-gray-400" />
+                              {caseItem.date}
+                            </TableCell>
+                            <TableCell className="flex items-center">
+                              <Clock className="mr-2 h-4 w-4 text-gray-400" />
+                              {caseItem.timeEstimate}
+                            </TableCell>
+                            <TableCell>
+                              <Badge className={getStatusBadgeColor(caseItem.status)}>
+                                {caseItem.status}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex justify-end gap-2">
+                                <Button 
+                                  size="sm" 
+                                  variant="ghost" 
+                                  className="text-gray-300 hover:text-white"
+                                  onClick={() => handleCaseInteraction(caseItem.id, "like")}
+                                >
+                                  <ThumbsUp className="h-4 w-4" />
+                                </Button>
+                                <Button asChild size="sm" className="bg-crimson hover:bg-crimson-dark text-white">
+                                  <Link to={`/investigacion/${caseItem.id}`}>
+                                    Investigar
+                                  </Link>
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                    
+                    {/* Pagination for table view */}
+                    {totalPages > 1 && (
+                      <div className="mt-6">
+                        <Pagination>
+                          <PaginationContent>
+                            <PaginationItem>
+                              <PaginationPrevious 
+                                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                                className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                              />
+                            </PaginationItem>
+                            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                              <PaginationItem key={page}>
+                                <PaginationLink 
+                                  onClick={() => setCurrentPage(page)}
+                                  isActive={currentPage === page}
+                                >
+                                  {page}
+                                </PaginationLink>
+                              </PaginationItem>
+                            ))}
+                            <PaginationItem>
+                              <PaginationNext 
+                                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                                className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                              />
+                            </PaginationItem>
+                          </PaginationContent>
+                        </Pagination>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <p className="text-gray-400 text-lg mb-4">No se encontraron casos que coincidan con los criterios de búsqueda.</p>
+                    <Button 
+                      variant="outline" 
+                      className="border-detective-light text-white hover:bg-detective-light/10"
+                      onClick={handleResetFilters}
+                    >
+                      <RefreshCw className="mr-2 h-4 w-4" />
+                      Limpiar filtros
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </AppLayout>
