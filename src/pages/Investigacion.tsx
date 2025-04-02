@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import AppLayout from "@/components/AppLayout";
@@ -589,7 +590,7 @@ const Investigacion = () => {
     // Add automated response based on character
     setTimeout(() => {
       const characterResponse = `Soy ${selectedCharacter.name}. ${
-        selectedCharacter.role === "Fallecido" 
+        selectedCharacter.status === "Fallecido" 
           ? "No puedo proporcionar información directa, pero se podría investigar más sobre mí."
           : "Gracias por contactarme en relación al caso."
       }`;
@@ -811,5 +812,520 @@ const Investigacion = () => {
                         <h3 className="text-lg font-semibold text-white">
                           {evidence.title}
                         </h3>
-                        <div className="flex">
-                          {evidence.type === "text
+                      </div>
+                      <p className="text-gray-400 text-sm mt-1">
+                        {evidence.description}
+                      </p>
+                    </div>
+                    <RenderMedia item={evidence} />
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+
+            {/* Testimonies Tab */}
+            <TabsContent value="testimonios" className="mt-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-white">
+                  Declaraciones y Testimonios
+                </h2>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Añadir Testimonio
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Añadir nuevo testimonio</DialogTitle>
+                      <DialogDescription>
+                        Complete los detalles del nuevo testimonio para el caso.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <AddEvidenceForm onClose={() => {}} />
+                  </DialogContent>
+                </Dialog>
+              </div>
+
+              <div className="space-y-6">
+                {caseData.testimonies.map((testimony) => (
+                  <div
+                    key={testimony.id}
+                    className="bg-detective-medium rounded-lg border border-detective-light p-6"
+                  >
+                    <div className="flex flex-col md:flex-row md:items-center gap-4 mb-4">
+                      <div className="flex-shrink-0">
+                        <div className="w-16 h-16 bg-detective-dark rounded-full flex items-center justify-center text-2xl font-bold text-white">
+                          {testimony.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")}
+                        </div>
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-white">
+                          {testimony.name}
+                        </h3>
+                        <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-gray-400">
+                          <div className="flex items-center">
+                            <span>{testimony.role}</span>
+                          </div>
+                          <div className="flex items-center">
+                            <Calendar className="h-4 w-4 mr-1" />
+                            <span>{testimony.date}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="prose prose-invert max-w-none mb-4">
+                      <p className="text-gray-300 whitespace-pre-line">
+                        {testimony.statement}
+                      </p>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 mt-4">
+                      {testimony.audioUrl && (
+                        <Button variant="outline" size="sm" asChild>
+                          <a
+                            href={testimony.audioUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="h-4 w-4 mr-2"
+                            >
+                              <path d="M18 8c2.2 0 4 1.8 4 4s-1.8 4-4 4"></path>
+                              <path d="M16 12V4c0-1.1-.9-2-2-2s-2 .9-2 2v8"></path>
+                              <rect
+                                x="4"
+                                y="6"
+                                width="5"
+                                height="12"
+                                rx="1"
+                              ></rect>
+                            </svg>
+                            Audio
+                          </a>
+                        </Button>
+                      )}
+                      {testimony.videoUrl && (
+                        <Button variant="outline" size="sm" asChild>
+                          <a
+                            href={testimony.videoUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <FileVideo className="h-4 w-4 mr-2" />
+                            Video
+                          </a>
+                        </Button>
+                      )}
+                      {testimony.transcriptUrl && (
+                        <Button variant="outline" size="sm" asChild>
+                          <a
+                            href={testimony.transcriptUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <FileText className="h-4 w-4 mr-2" />
+                            Transcripción
+                          </a>
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+
+            {/* Characters Tab */}
+            <TabsContent value="personajes" className="mt-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-white">
+                  Personajes del Caso
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {caseData.characters.map((character) => (
+                  <Card key={character.id} className="bg-detective-medium border-detective-light overflow-hidden flex flex-col">
+                    <div className="h-48 relative overflow-hidden">
+                      <img 
+                        src={character.image} 
+                        alt={character.name} 
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                        <div className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${
+                          character.status === "Fallecido" 
+                            ? "bg-red-900/60 text-red-200" 
+                            : "bg-green-900/60 text-green-200"
+                        }`}>
+                          {character.status}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="p-4 flex-grow">
+                      <h3 className="text-lg font-bold text-white mb-1">{character.name}</h3>
+                      <p className="text-sm text-gray-400 mb-3">{character.role}</p>
+                      <p className="text-gray-300 text-sm line-clamp-3 mb-4">{character.background}</p>
+                      
+                      <div className="flex flex-wrap gap-2 mt-auto">
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="outline" size="sm">
+                              <User className="h-4 w-4 mr-2" />
+                              Ver Detalles
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="sm:max-w-3xl">
+                            <DialogHeader>
+                              <DialogTitle>{character.name}</DialogTitle>
+                              <DialogDescription>{character.role}</DialogDescription>
+                            </DialogHeader>
+                            
+                            <div className="grid md:grid-cols-3 gap-6 mt-4">
+                              <div className="md:col-span-1">
+                                <img 
+                                  src={character.image} 
+                                  alt={character.name} 
+                                  className="w-full h-auto rounded-lg mb-4" 
+                                />
+                                <div className={`inline-block px-2 py-1 text-xs font-medium rounded-full mb-4 ${
+                                  character.status === "Fallecido" 
+                                    ? "bg-red-900/60 text-red-200" 
+                                    : "bg-green-900/60 text-green-200"
+                                }`}>
+                                  {character.status}
+                                </div>
+                              </div>
+                              
+                              <div className="md:col-span-2">
+                                <h3 className="text-lg font-semibold mb-2">Antecedentes</h3>
+                                <p className="text-gray-300 mb-4">{character.background}</p>
+                                
+                                <h3 className="text-lg font-semibold mb-2">Detalles</h3>
+                                <div className="space-y-2 mb-4">
+                                  {character.details.map((detail, idx) => (
+                                    <div key={idx} className="flex justify-between border-b border-detective-light pb-2">
+                                      <span className="text-gray-400">{detail.label}:</span>
+                                      <span className="text-white">{detail.value}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                                
+                                <h3 className="text-lg font-semibold mb-2">Notas</h3>
+                                <p className="text-gray-300">{character.notes}</p>
+                              </div>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                        
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleStartChat(character)}
+                        >
+                          <MessageSquare className="h-4 w-4 mr-2" />
+                          Hablar
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+              
+              {/* Chat dialog for character conversations */}
+              <Dialog open={showChatDialog} onOpenChange={setShowChatDialog}>
+                <DialogContent className="sm:max-w-lg">
+                  <DialogHeader>
+                    <DialogTitle>
+                      {selectedCharacter && (
+                        <div className="flex items-center">
+                          <div className="w-8 h-8 bg-detective-dark rounded-full flex items-center justify-center text-sm font-bold text-white mr-2">
+                            {selectedCharacter.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")}
+                          </div>
+                          <span>{selectedCharacter?.name}</span>
+                        </div>
+                      )}
+                    </DialogTitle>
+                    <DialogDescription>
+                      {selectedCharacter?.role}
+                    </DialogDescription>
+                  </DialogHeader>
+                  
+                  <div className="flex flex-col h-[400px]">
+                    <div className="flex-grow overflow-auto p-4 space-y-4 bg-detective-dark/50 rounded-md mb-4">
+                      {chatMessages.map((msg, idx) => {
+                        if (msg.sender === "system") {
+                          return (
+                            <div key={idx} className="text-center text-sm text-gray-400 bg-detective-medium/50 py-2 px-4 rounded-md">
+                              {msg.text}
+                            </div>
+                          );
+                        } else if (msg.sender === "user") {
+                          return (
+                            <div key={idx} className="flex justify-end">
+                              <div className="bg-blue-600/70 py-2 px-4 rounded-lg text-white max-w-[80%]">
+                                {msg.text}
+                              </div>
+                            </div>
+                          );
+                        } else {
+                          return (
+                            <div key={idx} className="flex justify-start">
+                              <div className="bg-detective-medium py-2 px-4 rounded-lg text-white max-w-[80%]">
+                                {msg.text}
+                              </div>
+                            </div>
+                          );
+                        }
+                      })}
+                    </div>
+                    
+                    <div className="flex items-center">
+                      <Input
+                        value={messageInput}
+                        onChange={(e) => setMessageInput(e.target.value)}
+                        placeholder="Escribe un mensaje..."
+                        className="flex-grow mr-2"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            handleSendMessage();
+                          }
+                        }}
+                      />
+                      <Button onClick={handleSendMessage}>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="h-4 w-4"
+                        >
+                          <line x1="22" y1="2" x2="11" y2="13"></line>
+                          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </TabsContent>
+
+            {/* News Tab */}
+            <TabsContent value="noticias" className="mt-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-white">
+                  Cobertura Mediática
+                </h2>
+              </div>
+
+              <div className="space-y-6">
+                {caseData.news.map((article) => (
+                  <div
+                    key={article.id}
+                    className="bg-detective-medium rounded-lg border border-detective-light overflow-hidden"
+                  >
+                    <div className="md:flex">
+                      <div className="md:w-1/3">
+                        <img
+                          src={article.imageUrl}
+                          alt={article.title}
+                          className="w-full h-full object-cover md:h-64"
+                        />
+                      </div>
+                      <div className="p-6 md:w-2/3">
+                        <div className="flex justify-between items-start mb-4">
+                          <div>
+                            <h3 className="text-xl font-bold text-white">
+                              {article.title}
+                            </h3>
+                            <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-gray-400 mt-1">
+                              <div className="flex items-center">
+                                <span>{article.source}</span>
+                              </div>
+                              <div className="flex items-center">
+                                <Calendar className="h-4 w-4 mr-1" />
+                                <span>{article.date}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button variant="outline" size="sm">
+                                <ExternalLink className="h-4 w-4 mr-2" />
+                                Leer
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-3xl">
+                              <DialogHeader>
+                                <DialogTitle>{article.title}</DialogTitle>
+                                <DialogDescription>
+                                  {article.source} | {article.date}
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="mt-4">
+                                <img
+                                  src={article.imageUrl}
+                                  alt={article.title}
+                                  className="w-full h-auto rounded-lg mb-6"
+                                />
+                                <div className="prose prose-invert max-w-none">
+                                  <p className="text-gray-300 whitespace-pre-line">
+                                    {article.content}
+                                  </p>
+                                </div>
+                                {article.pdfUrl && (
+                                  <div className="mt-6">
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      asChild
+                                    >
+                                      <a
+                                        href={article.pdfUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                      >
+                                        <FileText className="h-4 w-4 mr-2" />
+                                        Ver PDF original
+                                      </a>
+                                    </Button>
+                                  </div>
+                                )}
+                              </div>
+                            </DialogContent>
+                          </Dialog>
+                        </div>
+
+                        <p className="text-gray-400 text-sm mb-4">
+                          {article.excerpt}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+
+            {/* Interrogation Tab */}
+            <TabsContent value="interrogatorio" className="mt-6">
+              <div className="bg-detective-medium rounded-lg border border-detective-light p-6 mb-6">
+                <h2 className="text-xl font-bold text-white mb-4">
+                  Módulo de Interrogatorio Inteligente
+                </h2>
+                <p className="text-gray-300">
+                  Utilice esta herramienta para analizar patrones y generar preguntas inteligentes para sus interrogatorios. Seleccione un personaje para comenzar.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-detective-medium rounded-lg border border-detective-light p-6">
+                  <h3 className="text-lg font-bold text-white mb-4">
+                    Seleccionar Personaje
+                  </h3>
+                  <div className="space-y-4">
+                    {caseData.characters.map((character) => (
+                      <div
+                        key={character.id}
+                        className={`p-4 rounded-lg cursor-pointer transition-colors ${
+                          selectedCharacter?.id === character.id
+                            ? "bg-crimson/20 border border-crimson/50"
+                            : "bg-detective-dark hover:bg-detective-dark/70"
+                        }`}
+                        onClick={() => handleCharacterSelect(character)}
+                      >
+                        <div className="flex items-center">
+                          <div className="w-10 h-10 bg-detective-dark rounded-full flex items-center justify-center text-sm font-bold text-white mr-3">
+                            {character.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")}
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-white">
+                              {character.name}
+                            </h4>
+                            <p className="text-sm text-gray-400">
+                              {character.role}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-detective-medium rounded-lg border border-detective-light p-6">
+                  <h3 className="text-lg font-bold text-white mb-4">
+                    Preguntas Sugeridas
+                  </h3>
+                  {selectedCharacter ? (
+                    <div className="space-y-3">
+                      <p className="text-gray-300 mb-4">
+                        Preguntas generadas para {selectedCharacter.name}:
+                      </p>
+                      <div className="p-3 bg-detective-dark rounded-md hover:bg-detective-dark/80 cursor-pointer">
+                        <p className="text-white">¿Cuál es su relación con la mansión Blackwood?</p>
+                      </div>
+                      <div className="p-3 bg-detective-dark rounded-md hover:bg-detective-dark/80 cursor-pointer">
+                        <p className="text-white">¿Conocía a la víctima? ¿Cómo describiría su relación?</p>
+                      </div>
+                      <div className="p-3 bg-detective-dark rounded-md hover:bg-detective-dark/80 cursor-pointer">
+                        <p className="text-white">¿Dónde estaba usted la noche del incidente?</p>
+                      </div>
+                      <div className="p-3 bg-detective-dark rounded-md hover:bg-detective-dark/80 cursor-pointer">
+                        <p className="text-white">¿Hay algo inusual que haya notado recientemente?</p>
+                      </div>
+                      <Button 
+                        className="w-full mt-4"
+                        onClick={() => {
+                          if (selectedCharacter) {
+                            handleStartChat(selectedCharacter);
+                          }
+                        }}
+                      >
+                        <MessageSquare className="mr-2 h-4 w-4" />
+                        Iniciar Interrogatorio
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center h-48 bg-detective-dark rounded-lg">
+                      <p className="text-gray-500">
+                        Seleccione un personaje para ver preguntas sugeridas
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
+    </AppLayout>
+  );
+};
+
+export default Investigacion;
