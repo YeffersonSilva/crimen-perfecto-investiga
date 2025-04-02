@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import AppLayout from "@/components/AppLayout";
@@ -48,6 +47,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 
 // Mock case data
 const caseDetails = {
@@ -178,6 +178,72 @@ const caseDetails = {
           "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
       },
     ],
+    characters: [
+      {
+        id: "char-1",
+        name: "Victor Blackwood",
+        role: "Ex-propietario fallecido",
+        image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
+        status: "Fallecido",
+        background: "Último miembro conocido de la familia Blackwood. Toxicólogo retirado que trabajó para importantes laboratorios farmacéuticos. Falleció en 2010.",
+        details: [
+          { label: "Edad al fallecer", value: "78 años" },
+          { label: "Profesión", value: "Toxicólogo" },
+          { label: "Conexión con el caso", value: "Propietario original de la mansión" },
+          { label: "Estado", value: "Fallecido (2010)" },
+          { label: "Relaciones conocidas", value: "Sin descendientes conocidos" }
+        ],
+        notes: "Victor Blackwood vivió en solitario durante sus últimos años. Sus investigaciones en toxicología le valieron reconocimiento internacional, aunque también generaron controversias por sus métodos poco ortodoxos."
+      },
+      {
+        id: "char-2",
+        name: "Margaret Winters",
+        role: "Ama de llaves retirada",
+        image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
+        status: "Viva",
+        background: "Trabajó para la familia Blackwood durante más de 40 años. Se retiró tras la muerte de Victor Blackwood. Conoce todos los secretos de la mansión y de la familia.",
+        details: [
+          { label: "Edad", value: "82 años" },
+          { label: "Profesión", value: "Ama de llaves (retirada)" },
+          { label: "Años de servicio", value: "1965-2010" },
+          { label: "Residencia actual", value: "Villa Serenidad, Calle Roble 45" },
+          { label: "Relación con la víctima", value: "Desconocida" }
+        ],
+        notes: "Winters fue extremadamente leal a la familia Blackwood. Tiene una memoria excepcional y conoce cada rincón de la mansión."
+      },
+      {
+        id: "char-3",
+        name: "Lucas Fernández",
+        role: "Adolescente testigo",
+        image: "https://images.unsplash.com/photo-1531297484001-80022131f5a1",
+        status: "Vivo",
+        background: "Estudiante de secundaria aficionado a explorar lugares abandonados. Encontró el cadáver junto con sus amigos y llamó a la policía.",
+        details: [
+          { label: "Edad", value: "17 años" },
+          { label: "Ocupación", value: "Estudiante" },
+          { label: "Conexión con el caso", value: "Descubridor del cuerpo" },
+          { label: "Teléfono", value: "555-1234" },
+          { label: "Dirección", value: "Av. Principal 234, Ciudad" }
+        ],
+        notes: "Lucas ha visitado la mansión en múltiples ocasiones con anterioridad. Afirma que nunca había visto nada extraño hasta el día del descubrimiento."
+      },
+      {
+        id: "char-4",
+        name: "Dr. Elena Ruiz",
+        role: "Médico forense",
+        image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5",
+        status: "Viva",
+        background: "Responsable de la autopsia preliminar. Especialista en toxicología forense con 15 años de experiencia.",
+        details: [
+          { label: "Edad", value: "42 años" },
+          { label: "Especialidad", value: "Toxicología forense" },
+          { label: "Años de experiencia", value: "15" },
+          { label: "Institución", value: "Instituto Forense Municipal" },
+          { label: "Credenciales", value: "Doctorado en Medicina Forense" }
+        ],
+        notes: "La Dra. Ruiz ha mostrado un interés particular en este caso debido a las extrañas sustancias encontradas en el cuerpo de la víctima."
+      }
+    ]
   },
   // Otros casos irían aquí
 };
@@ -485,6 +551,10 @@ const Investigacion = () => {
   const { id } = useParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState("expediente");
   const [showAddEvidence, setShowAddEvidence] = useState(false);
+  const [selectedCharacter, setSelectedCharacter] = useState(null);
+  const [showChatDialog, setShowChatDialog] = useState(false);
+  const [chatMessages, setChatMessages] = useState([]);
+  const [messageInput, setMessageInput] = useState("");
 
   // Check if case exists
   if (!id || !caseDetails[id as keyof typeof caseDetails]) {
@@ -506,6 +576,50 @@ const Investigacion = () => {
   }
 
   const caseData = caseDetails[id as keyof typeof caseDetails];
+
+  const handleSendMessage = () => {
+    if (!messageInput.trim()) return;
+    
+    // Add user message
+    const newMessages = [
+      ...chatMessages,
+      { sender: "user", text: messageInput }
+    ];
+    
+    // Add automated response based on character
+    setTimeout(() => {
+      const characterResponse = `Soy ${selectedCharacter.name}. ${
+        selectedCharacter.role === "Fallecido" 
+          ? "No puedo proporcionar información directa, pero se podría investigar más sobre mí."
+          : "Gracias por contactarme en relación al caso."
+      }`;
+      
+      setChatMessages([
+        ...newMessages,
+        { sender: "character", text: characterResponse }
+      ]);
+    }, 1000);
+    
+    setChatMessages(newMessages);
+    setMessageInput("");
+  };
+
+  const handleCharacterSelect = (character) => {
+    setSelectedCharacter(character);
+  };
+
+  const handleStartChat = (character) => {
+    setSelectedCharacter(character);
+    setChatMessages([
+      { 
+        sender: "system", 
+        text: `Iniciando conversación con ${character.name}. ${character.status === "Fallecido" 
+          ? "Nota: Esta es una recreación basada en registros históricos." 
+          : "Por favor, mantenga las preguntas relacionadas con el caso."}`
+      }
+    ]);
+    setShowChatDialog(true);
+  };
 
   return (
     <AppLayout>
@@ -592,6 +706,13 @@ const Investigacion = () => {
               >
                 <Users className="h-4 w-4 mr-2" />
                 Testimonios
+              </TabsTrigger>
+              <TabsTrigger
+                value="personajes"
+                className="data-[state=active]:bg-detective-light"
+              >
+                <User className="h-4 w-4 mr-2" />
+                Personajes
               </TabsTrigger>
               <TabsTrigger
                 value="noticias"
@@ -691,275 +812,4 @@ const Investigacion = () => {
                           {evidence.title}
                         </h3>
                         <div className="flex">
-                          {evidence.type === "text" && (
-                            <File className="h-4 w-4 text-gray-400" />
-                          )}
-                          {evidence.type === "image" && (
-                            <FileImage className="h-4 w-4 text-blue-400" />
-                          )}
-                          {evidence.type === "video" && (
-                            <FileVideo className="h-4 w-4 text-green-400" />
-                          )}
-                          {evidence.type === "pdf" && (
-                            <FileText className="h-4 w-4 text-red-400" />
-                          )}
-                        </div>
-                      </div>
-                      <p className="text-gray-400 text-sm">
-                        {evidence.description}
-                      </p>
-                    </div>
-
-                    <RenderMedia item={evidence} />
-                  </div>
-                ))}
-              </div>
-            </TabsContent>
-
-            {/* Testimonies Tab */}
-            <TabsContent value="testimonios" className="mt-6">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-white">
-                  Declaraciones de Testigos
-                </h2>
-                <Button variant="outline">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Añadir Testimonio
-                </Button>
-              </div>
-
-              <div className="space-y-6">
-                {caseData.testimonies.map((testimony) => (
-                  <div
-                    key={testimony.id}
-                    className="bg-detective-medium rounded-lg border border-detective-light overflow-hidden"
-                  >
-                    <div className="p-6">
-                      <div className="flex flex-col md:flex-row justify-between mb-4">
-                        <div>
-                          <h3 className="text-lg font-semibold text-white">
-                            {testimony.name}
-                          </h3>
-                          <p className="text-gray-400">{testimony.role}</p>
-                        </div>
-                        <span className="text-sm text-gray-400 mt-2 md:mt-0">
-                          {testimony.date}
-                        </span>
-                      </div>
-
-                      <blockquote className="border-l-2 border-crimson pl-4 italic text-gray-300 mb-4">
-                        "{testimony.statement}"
-                      </blockquote>
-
-                      <div className="flex flex-wrap gap-2 mt-4">
-                        {testimony.audioUrl && (
-                          <Button variant="outline" size="sm" asChild>
-                            <a
-                              href={testimony.audioUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="16"
-                                height="16"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                className="mr-2"
-                              >
-                                <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
-                                <line x1="12" y1="2" x2="12" y2="12"></line>
-                              </svg>
-                              Escuchar Audio
-                            </a>
-                          </Button>
-                        )}
-
-                        {testimony.videoUrl && (
-                          <Button variant="outline" size="sm" asChild>
-                            <a
-                              href={testimony.videoUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              <FileVideo className="h-4 w-4 mr-2" />
-                              Ver Video
-                            </a>
-                          </Button>
-                        )}
-
-                        {testimony.transcriptUrl && (
-                          <Button variant="outline" size="sm" asChild>
-                            <a
-                              href={testimony.transcriptUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              <FileText className="h-4 w-4 mr-2" />
-                              Transcripción
-                            </a>
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </TabsContent>
-
-            {/* News Tab */}
-            <TabsContent value="noticias" className="mt-6">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-white">
-                  Artículos Relacionados
-                </h2>
-                <Button variant="outline">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Añadir Artículo
-                </Button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {caseData.news.map((article) => (
-                  <div
-                    key={article.id}
-                    className="bg-detective-medium rounded-lg border border-detective-light overflow-hidden"
-                  >
-                    {article.imageUrl && (
-                      <div className="h-48 overflow-hidden">
-                        <img
-                          src={article.imageUrl}
-                          alt={article.title}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    )}
-
-                    <div className="p-6">
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="text-lg font-semibold text-white">
-                          {article.title}
-                        </h3>
-                        <span className="text-sm text-gray-400">
-                          {article.date}
-                        </span>
-                      </div>
-                      <p className="text-gray-400 text-sm mb-4">
-                        Fuente: {article.source}
-                      </p>
-
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className="w-full justify-between mt-4"
-                          >
-                            <span>Leer artículo completo</span>
-                            <ExternalLink className="h-4 w-4 ml-2" />
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-                          <DialogHeader>
-                            <DialogTitle>{article.title}</DialogTitle>
-                            <DialogDescription>
-                              {article.source} • {article.date}
-                            </DialogDescription>
-                          </DialogHeader>
-
-                          {article.imageUrl && (
-                            <div className="mt-4 mb-6">
-                              <img
-                                src={article.imageUrl}
-                                alt={article.title}
-                                className="w-full h-auto rounded-md"
-                              />
-                            </div>
-                          )}
-
-                          <div className="prose prose-invert max-w-none">
-                            <p className="text-gray-300 whitespace-pre-line">
-                              {article.content}
-                            </p>
-                          </div>
-
-                          {article.pdfUrl && (
-                            <div className="mt-6">
-                              <Button variant="outline" asChild>
-                                <a
-                                  href={article.pdfUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                >
-                                  <FileText className="h-4 w-4 mr-2" />
-                                  Ver PDF original
-                                </a>
-                              </Button>
-                            </div>
-                          )}
-                        </DialogContent>
-                      </Dialog>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </TabsContent>
-
-            {/* Interrogation Tab */}
-            <TabsContent value="interrogatorio" className="mt-6">
-              <div className="bg-detective-medium rounded-lg border border-detective-light p-6 mb-6">
-                <h2 className="text-xl font-bold text-white mb-4">
-                  Asistente de Investigación
-                </h2>
-                <p className="text-gray-300 mb-4">
-                  Utiliza el asistente para analizar pruebas, generar hipótesis o
-                  solicitar información adicional sobre el caso.
-                </p>
-                
-                <div className="mt-4 border border-detective-light rounded-lg overflow-hidden">
-                  <div className="bg-detective-medium p-4">
-                    <div className="flex flex-col space-y-4">
-                      <div className="flex items-start">
-                        <div className="bg-detective-light p-3 rounded-lg max-w-[80%]">
-                          <p className="text-white">
-                            ¿Qué puedo hacer para avanzar en la investigación del caso?
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-start justify-end">
-                        <div className="bg-crimson p-3 rounded-lg max-w-[80%]">
-                          <p className="text-white">
-                            Basado en las evidencias recolectadas, recomendaría analizar en detalle el informe toxicológico y buscar conexiones con la historia personal de Victor Blackwood, quien era toxicólogo. La nota encontrada en el bolsillo de la víctima sugiere una reunión planificada. Deberías investigar quién es "M" y qué relación podría tener con la propiedad.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="p-4 bg-detective-dark">
-                    <div className="flex items-center">
-                      <Textarea 
-                        placeholder="Escribe tu consulta aquí..." 
-                        className="resize-none bg-detective-medium border-detective-light"
-                      />
-                      <Button className="ml-2 bg-crimson hover:bg-crimson-dark">
-                        Enviar
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </div>
-      </div>
-    </AppLayout>
-  );
-};
-
-export default Investigacion;
-
+                          {evidence.type === "text
