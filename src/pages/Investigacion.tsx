@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import AppLayout from "@/components/AppLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   FileText,
   Camera,
@@ -22,6 +22,12 @@ import {
   FileImage,
   Plus,
   X,
+  MapPin,
+  Search,
+  Coffee,
+  AlertTriangle,
+  Bookmark,
+  Paperclip,
 } from "lucide-react";
 import {
   Dialog,
@@ -258,14 +264,19 @@ const RenderMedia = ({ item }) => {
       return (
         <Dialog>
           <DialogTrigger asChild>
-            <div className="relative group cursor-pointer rounded overflow-hidden h-48">
+            <div className="relative group cursor-pointer rounded-md overflow-hidden h-48 border border-detective-light/50 shadow-md">
               <img
                 src={item.url}
                 alt={item.title}
-                className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
-              <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <ExternalLink className="text-white h-6 w-6" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end opacity-100 p-3">
+                <h4 className="text-white font-medium text-sm">{item.title}</h4>
+              </div>
+              <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
+                <div className="bg-white/20 rounded-full p-3 backdrop-blur-sm">
+                  <ExternalLink className="text-white h-6 w-6" />
+                </div>
               </div>
             </div>
           </DialogTrigger>
@@ -274,7 +285,7 @@ const RenderMedia = ({ item }) => {
               <DialogTitle>{item.title}</DialogTitle>
               <DialogDescription>{item.description}</DialogDescription>
             </DialogHeader>
-            <div className="mt-4 max-h-[70vh] overflow-auto">
+            <div className="mt-4 max-h-[70vh] overflow-auto rounded-md overflow-hidden shadow-xl">
               <img src={item.url} alt={item.title} className="w-full h-auto" />
             </div>
           </DialogContent>
@@ -283,24 +294,28 @@ const RenderMedia = ({ item }) => {
 
     case "pdf":
       return (
-        <div className="flex items-center p-4 border border-detective-light rounded-md bg-detective-dark">
-          <FileText className="h-8 w-8 text-crimson mr-4" />
+        <div className="flex items-center p-4 border border-detective-light/80 rounded-md bg-detective-dark/80 hover:bg-detective-dark transition-colors shadow-md group">
+          <div className="bg-crimson/10 rounded-full p-2 mr-3">
+            <FileText className="h-6 w-6 text-crimson" />
+          </div>
           <div className="flex-1">
             <h4 className="text-white font-medium">{item.title}</h4>
             <p className="text-gray-400 text-sm">
               {item.description || "Documento PDF"}
             </p>
           </div>
-          <Button variant="outline" size="sm" className="ml-2" asChild>
-            <a href={item.url} target="_blank" rel="noopener noreferrer">
-              <ExternalLink className="h-4 w-4 mr-2" /> Ver
-            </a>
-          </Button>
-          <Button variant="outline" size="sm" className="ml-2" asChild>
-            <a href={item.url} download>
-              <Download className="h-4 w-4 mr-2" /> Descargar
-            </a>
-          </Button>
+          <div className="flex space-x-2">
+            <Button variant="ghost" size="sm" className="opacity-80 group-hover:opacity-100" asChild>
+              <a href={item.url} target="_blank" rel="noopener noreferrer">
+                <ExternalLink className="h-4 w-4 mr-2" /> Ver
+              </a>
+            </Button>
+            <Button variant="ghost" size="sm" className="opacity-80 group-hover:opacity-100" asChild>
+              <a href={item.url} download>
+                <Download className="h-4 w-4 mr-2" /> Descargar
+              </a>
+            </Button>
+          </div>
         </div>
       );
 
@@ -308,17 +323,20 @@ const RenderMedia = ({ item }) => {
       return (
         <Dialog>
           <DialogTrigger asChild>
-            <div className="relative group cursor-pointer rounded overflow-hidden h-48">
+            <div className="relative group cursor-pointer rounded-md overflow-hidden h-48 border border-detective-light/50 shadow-md">
               <img
                 src={
                   item.thumbnail ||
                   "https://images.unsplash.com/photo-1531297484001-80022131f5a1"
                 }
                 alt={item.title}
-                className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
-              <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                <div className="rounded-full bg-white bg-opacity-25 p-3">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end opacity-100 p-3">
+                <h4 className="text-white font-medium text-sm">{item.title}</h4>
+              </div>
+              <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[1px]">
+                <div className="rounded-full bg-white/20 p-3 backdrop-blur-sm border border-white/30 animate-pulse-slow shadow-lg">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"
@@ -342,7 +360,7 @@ const RenderMedia = ({ item }) => {
               <DialogTitle>{item.title}</DialogTitle>
               <DialogDescription>{item.description}</DialogDescription>
             </DialogHeader>
-            <div className="mt-4 aspect-video">
+            <div className="mt-4 aspect-video rounded-md overflow-hidden shadow-xl">
               <video
                 src={item.url}
                 controls
@@ -357,19 +375,22 @@ const RenderMedia = ({ item }) => {
     case "text":
     default:
       return (
-        <Collapsible className="w-full border border-detective-light rounded-md overflow-hidden">
-          <CollapsibleTrigger className="flex justify-between items-center w-full p-4 bg-detective-medium text-left">
+        <Collapsible className="w-full border border-detective-light/80 rounded-md overflow-hidden shadow-md">
+          <CollapsibleTrigger className="flex justify-between items-center w-full p-4 bg-detective-medium/80 text-left hover:bg-detective-medium">
             <div>
               <h4 className="text-white font-medium">{item.title}</h4>
               {item.date && (
-                <p className="text-gray-400 text-sm">{item.date}</p>
+                <div className="flex items-center text-gray-400 text-sm mt-1">
+                  <Calendar className="h-3 w-3 mr-1 inline" />
+                  <span>{item.date}</span>
+                </div>
               )}
             </div>
             <div className="text-gray-400">
               <ChevronLeft className="transform transition-transform duration-200 collapsible-rotate" />
             </div>
           </CollapsibleTrigger>
-          <CollapsibleContent className="bg-detective-dark p-4">
+          <CollapsibleContent className="bg-detective-dark/80 p-5 border-t border-detective-light/40">
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 whitespace-pre-line">
                 {item.content}
@@ -624,11 +645,11 @@ const Investigacion = () => {
 
   return (
     <AppLayout>
-      {/* Case header */}
-      <div className="bg-detective-medium border-b border-detective-light">
-        <div className="container mx-auto px-4 py-8">
+      {/* Case header with stylish gradient background */}
+      <div className="bg-gradient-to-r from-detective-dark via-detective-medium to-detective-dark border-b border-detective-light">
+        <div className="container mx-auto px-4 py-10">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-            <div>
+            <div className="animate-fade-in">
               <div className="flex items-center mb-4">
                 <Button
                   variant="ghost"
@@ -638,115 +659,120 @@ const Investigacion = () => {
                 >
                   <a
                     href="/casos"
-                    className="text-gray-400 hover:text-gray-200"
+                    className="text-gray-400 hover:text-gray-200 flex items-center"
                   >
                     <ChevronLeft className="h-4 w-4 mr-1" />
                     Volver a casos
                   </a>
                 </Button>
 
-                <div className="text-evidence-red font-medium px-2 py-0.5 bg-evidence-red/10 rounded">
+                <div className="text-evidence-red font-medium px-2 py-0.5 bg-evidence-red/10 rounded-full border border-evidence-red/20 text-sm ml-2">
+                  <span className="inline-block h-2 w-2 rounded-full bg-evidence-red animate-pulse mr-1"></span>
                   Caso Abierto
                 </div>
               </div>
 
-              <h1 className="text-3xl font-bold text-white mb-2">
+              <h1 className="text-4xl font-bold text-white mb-3 text-gradient">
                 {caseData.title}
               </h1>
+              
+              <p className="text-gray-300 mb-4 max-w-3xl opacity-90">
+                {caseData.description}
+              </p>
 
               <div className="flex flex-wrap gap-y-2 text-sm text-gray-400 mb-4">
-                <div className="flex items-center mr-4">
-                  <Calendar className="h-4 w-4 mr-1" />
+                <div className="flex items-center mr-6 bg-detective-dark/50 px-3 py-1 rounded-full">
+                  <Calendar className="h-4 w-4 mr-2 text-crimson" />
                   <span>Fecha: {caseData.date}</span>
                 </div>
-                <div className="flex items-center mr-4">
-                  <User className="h-4 w-4 mr-1" />
+                <div className="flex items-center mr-6 bg-detective-dark/50 px-3 py-1 rounded-full">
+                  <User className="h-4 w-4 mr-2 text-crimson" />
                   <span>Investigador: {caseData.investigator}</span>
                 </div>
-                <div className="flex items-center mr-4">
+                <div className="flex items-center mr-6 bg-detective-dark/50 px-3 py-1 rounded-full">
+                  <MapPin className="h-4 w-4 mr-2 text-crimson" />
                   <span>Ubicación: {caseData.location}</span>
                 </div>
               </div>
             </div>
 
             <div className="mt-4 md:mt-0">
-              <Button className="bg-crimson hover:bg-crimson-dark text-white">
+              <Button className="bg-crimson hover:bg-crimson-dark text-white shadow-md shadow-crimson/20 hover:shadow-lg hover:shadow-crimson/30 transition-all">
                 Presentar Conclusiones
               </Button>
+              <div className="mt-2 text-xs text-gray-400 text-right">
+                Caso #ID-{id.replace('caso-', '')}
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Investigation tabs */}
-      <div className="bg-detective-dark">
+      {/* Investigation tabs with improved styling */}
+      <div className="bg-detective-dark min-h-[calc(100vh-12rem)]">
         <div className="container mx-auto px-4 py-8">
           <Tabs
             value={activeTab}
             onValueChange={setActiveTab}
             className="w-full"
           >
-            <TabsList className="bg-detective-medium w-full justify-start overflow-x-auto">
-              <TabsTrigger
-                value="expediente"
-                className="data-[state=active]:bg-detective-light"
-              >
-                <FileText className="h-4 w-4 mr-2" />
-                Expediente
-              </TabsTrigger>
-              <TabsTrigger
-                value="evidencias"
-                className="data-[state=active]:bg-detective-light"
-              >
-                <Camera className="h-4 w-4 mr-2" />
-                Evidencias
-              </TabsTrigger>
-              <TabsTrigger
-                value="testimonios"
-                className="data-[state=active]:bg-detective-light"
-              >
-                <Users className="h-4 w-4 mr-2" />
-                Testimonios
-              </TabsTrigger>
-              <TabsTrigger
-                value="personajes"
-                className="data-[state=active]:bg-detective-light"
-              >
-                <User className="h-4 w-4 mr-2" />
-                Personajes
-              </TabsTrigger>
-              <TabsTrigger
-                value="noticias"
-                className="data-[state=active]:bg-detective-light"
-              >
-                <Newspaper className="h-4 w-4 mr-2" />
-                Noticias
-              </TabsTrigger>
-              <TabsTrigger
-                value="interrogatorio"
-                className="data-[state=active]:bg-detective-light"
-              >
-                <MessageSquare className="h-4 w-4 mr-2" />
-                Interrogatorio
-              </TabsTrigger>
-            </TabsList>
+            <div className="sticky top-0 z-10 bg-detective-dark pb-2">
+              <TabsList className="bg-detective-medium/80 w-full justify-start overflow-x-auto backdrop-blur-sm rounded-lg border border-detective-light/30 shadow-md">
+                <TabsTrigger
+                  value="expediente"
+                  className="data-[state=active]:bg-crimson data-[state=active]:text-white"
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  Expediente
+                </TabsTrigger>
+                <TabsTrigger
+                  value="evidencias"
+                  className="data-[state=active]:bg-crimson data-[state=active]:text-white"
+                >
+                  <Camera className="h-4 w-4 mr-2" />
+                  Evidencias
+                </TabsTrigger>
+                <TabsTrigger
+                  value="testimonios"
+                  className="data-[state=active]:bg-crimson data-[state=active]:text-white"
+                >
+                  <Users className="h-4 w-4 mr-2" />
+                  Testimonios
+                </TabsTrigger>
+                <TabsTrigger
+                  value="personajes"
+                  className="data-[state=active]:bg-crimson data-[state=active]:text-white"
+                >
+                  <User className="h-4 w-4 mr-2" />
+                  Personajes
+                </TabsTrigger>
+                <TabsTrigger
+                  value="noticias"
+                  className="data-[state=active]:bg-crimson data-[state=active]:text-white"
+                >
+                  <Newspaper className="h-4 w-4 mr-2" />
+                  Noticias
+                </TabsTrigger>
+                <TabsTrigger
+                  value="interrogatorio"
+                  className="data-[state=active]:bg-crimson data-[state=active]:text-white"
+                >
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  Interrogatorio
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
             {/* Case File Tab */}
-            <TabsContent value="expediente" className="mt-6">
-              <div className="bg-detective-medium rounded-lg border border-detective-light p-6 mb-6">
-                <h2 className="text-xl font-bold text-white mb-4">
-                  Descripción del Caso
-                </h2>
-                <p className="text-gray-300">{caseData.description}</p>
-              </div>
-
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold text-white">
+            <TabsContent value="expediente" className="mt-6 animate-fade-in">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-white flex items-center">
+                  <FileText className="h-5 w-5 mr-2 text-crimson" />
                   Informes Oficiales
                 </h2>
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" className="bg-detective-medium/70 border-detective-light/50 hover:bg-detective-medium">
                       <Plus className="h-4 w-4 mr-2" />
                       Añadir Informe
                     </Button>
@@ -771,9 +797,10 @@ const Investigacion = () => {
             </TabsContent>
 
             {/* Evidence Tab */}
-            <TabsContent value="evidencias" className="mt-6">
+            <TabsContent value="evidencias" className="mt-6 animate-fade-in">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-white">
+                <h2 className="text-xl font-bold text-white flex items-center">
+                  <Camera className="h-5 w-5 mr-2 text-crimson" />
                   Evidencias Recolectadas
                 </h2>
                 <Dialog
@@ -781,7 +808,7 @@ const Investigacion = () => {
                   onOpenChange={setShowAddEvidence}
                 >
                   <DialogTrigger asChild>
-                    <Button variant="outline">
+                    <Button variant="outline" className="bg-detective-medium/70 border-detective-light/50 hover:bg-detective-medium">
                       <Plus className="h-4 w-4 mr-2" />
                       Añadir Evidencia
                     </Button>
@@ -805,7 +832,7 @@ const Investigacion = () => {
                 {caseData.evidence.map((evidence) => (
                   <div
                     key={evidence.id}
-                    className="bg-detective-medium p-4 rounded-lg border border-detective-light"
+                    className="bg-detective-medium/70 p-5 rounded-lg border border-detective-light/50 shadow-md hover:shadow-lg transition-all hover:bg-detective-medium/90"
                   >
                     <div className="mb-3">
                       <div className="flex justify-between items-start">
@@ -824,14 +851,15 @@ const Investigacion = () => {
             </TabsContent>
 
             {/* Testimonies Tab */}
-            <TabsContent value="testimonios" className="mt-6">
+            <TabsContent value="testimonios" className="mt-6 animate-fade-in">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-white">
+                <h2 className="text-xl font-bold text-white flex items-center">
+                  <Users className="h-5 w-5 mr-2 text-crimson" />
                   Declaraciones y Testimonios
                 </h2>
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button variant="outline">
+                    <Button variant="outline" className="bg-detective-medium/70 border-detective-light/50 hover:bg-detective-medium">
                       <Plus className="h-4 w-4 mr-2" />
                       Añadir Testimonio
                     </Button>
@@ -852,11 +880,11 @@ const Investigacion = () => {
                 {caseData.testimonies.map((testimony) => (
                   <div
                     key={testimony.id}
-                    className="bg-detective-medium rounded-lg border border-detective-light p-6"
+                    className="bg-detective-medium/70 rounded-lg border border-detective-light/50 p-6 shadow-md hover:shadow-lg transition-all hover:bg-detective-medium/90"
                   >
-                    <div className="flex flex-col md:flex-row md:items-center gap-4 mb-4">
+                    <div className="flex flex-col md:flex-row md:items-center gap-4 mb-5">
                       <div className="flex-shrink-0">
-                        <div className="w-16 h-16 bg-detective-dark rounded-full flex items-center justify-center text-2xl font-bold text-white">
+                        <div className="w-16 h-16 bg-gradient-to-br from-crimson/60 to-detective-dark rounded-full flex items-center justify-center text-2xl font-bold text-white shadow-inner">
                           {testimony.name
                             .split(" ")
                             .map((n) => n[0])
@@ -868,26 +896,26 @@ const Investigacion = () => {
                           {testimony.name}
                         </h3>
                         <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-gray-400">
-                          <div className="flex items-center">
+                          <div className="flex items-center bg-detective-dark/50 px-2 py-0.5 rounded-full mt-1">
                             <span>{testimony.role}</span>
                           </div>
-                          <div className="flex items-center">
-                            <Calendar className="h-4 w-4 mr-1" />
+                          <div className="flex items-center bg-detective-dark/50 px-2 py-0.5 rounded-full mt-1">
+                            <Calendar className="h-3 w-3 mr-1" />
                             <span>{testimony.date}</span>
                           </div>
                         </div>
                       </div>
                     </div>
 
-                    <div className="prose prose-invert max-w-none mb-4">
+                    <div className="prose prose-invert max-w-none mb-4 p-4 bg-detective-dark/50 rounded-md border border-detective-light/30">
                       <p className="text-gray-300 whitespace-pre-line">
-                        {testimony.statement}
+                        "{testimony.statement}"
                       </p>
                     </div>
 
                     <div className="flex flex-wrap gap-2 mt-4">
                       {testimony.audioUrl && (
-                        <Button variant="outline" size="sm" asChild>
+                        <Button variant="outline" size="sm" className="bg-detective-dark/30 hover:bg-detective-dark/60" asChild>
                           <a
                             href={testimony.audioUrl}
                             target="_blank"
@@ -920,7 +948,7 @@ const Investigacion = () => {
                         </Button>
                       )}
                       {testimony.videoUrl && (
-                        <Button variant="outline" size="sm" asChild>
+                        <Button variant="outline" size="sm" className="bg-detective-dark/30 hover:bg-detective-dark/60" asChild>
                           <a
                             href={testimony.videoUrl}
                             target="_blank"
@@ -932,7 +960,7 @@ const Investigacion = () => {
                         </Button>
                       )}
                       {testimony.transcriptUrl && (
-                        <Button variant="outline" size="sm" asChild>
+                        <Button variant="outline" size="sm" className="bg-detective-dark/30 hover:bg-detective-dark/60" asChild>
                           <a
                             href={testimony.transcriptUrl}
                             target="_blank"
@@ -950,34 +978,36 @@ const Investigacion = () => {
             </TabsContent>
 
             {/* Characters Tab */}
-            <TabsContent value="personajes" className="mt-6">
+            <TabsContent value="personajes" className="mt-6 animate-fade-in">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-white">
+                <h2 className="text-xl font-bold text-white flex items-center">
+                  <User className="h-5 w-5 mr-2 text-crimson" />
                   Personajes del Caso
                 </h2>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {caseData.characters.map((character) => (
-                  <Card key={character.id} className="bg-detective-medium border-detective-light overflow-hidden flex flex-col">
+                  <Card key={character.id} className="bg-detective-medium/70 border-detective-light/50 overflow-hidden flex flex-col hover:shadow-xl hover:translate-y-[-5px] group">
                     <div className="h-48 relative overflow-hidden">
                       <img 
                         src={character.image} 
                         alt={character.name} 
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                       />
-                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
+                      <div className="absolute bottom-0 left-0 right-0 p-4">
                         <div className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${
                           character.status === "Fallecido" 
-                            ? "bg-red-900/60 text-red-200" 
-                            : "bg-green-900/60 text-green-200"
+                            ? "bg-red-900/60 text-red-200 border border-red-900/40" 
+                            : "bg-green-900/60 text-green-200 border border-green-900/40"
                         }`}>
                           {character.status}
                         </div>
                       </div>
                     </div>
                     
-                    <div className="p-4 flex-grow">
+                    <CardContent className="p-4 flex-grow bg-gradient-to-t from-detective-medium to-detective-medium/80">
                       <h3 className="text-lg font-bold text-white mb-1">{character.name}</h3>
                       <p className="text-sm text-gray-400 mb-3">{character.role}</p>
                       <p className="text-gray-300 text-sm line-clamp-3 mb-4">{character.background}</p>
@@ -985,49 +1015,91 @@ const Investigacion = () => {
                       <div className="flex flex-wrap gap-2 mt-auto">
                         <Dialog>
                           <DialogTrigger asChild>
-                            <Button variant="outline" size="sm">
+                            <Button variant="outline" size="sm" className="bg-detective-dark/40 hover:bg-detective-dark/80">
                               <User className="h-4 w-4 mr-2" />
                               Ver Detalles
                             </Button>
                           </DialogTrigger>
                           <DialogContent className="sm:max-w-3xl">
                             <DialogHeader>
-                              <DialogTitle>{character.name}</DialogTitle>
+                              <DialogTitle className="flex items-center">
+                                <span className={`inline-block w-3 h-3 rounded-full mr-2 ${
+                                  character.status === "Fallecido" ? "bg-red-500" : "bg-green-500"
+                                }`}></span>
+                                {character.name}
+                              </DialogTitle>
                               <DialogDescription>{character.role}</DialogDescription>
                             </DialogHeader>
                             
                             <div className="grid md:grid-cols-3 gap-6 mt-4">
                               <div className="md:col-span-1">
-                                <img 
-                                  src={character.image} 
-                                  alt={character.name} 
-                                  className="w-full h-auto rounded-lg mb-4" 
-                                />
-                                <div className={`inline-block px-2 py-1 text-xs font-medium rounded-full mb-4 ${
-                                  character.status === "Fallecido" 
-                                    ? "bg-red-900/60 text-red-200" 
-                                    : "bg-green-900/60 text-green-200"
-                                }`}>
-                                  {character.status}
+                                <div className="relative rounded-lg overflow-hidden shadow-lg mb-4">
+                                  <img 
+                                    src={character.image} 
+                                    alt={character.name} 
+                                    className="w-full h-auto" 
+                                  />
+                                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                                  <div className="absolute bottom-0 left-0 right-0 p-3">
+                                    <div className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${
+                                      character.status === "Fallecido" 
+                                        ? "bg-red-900/60 text-red-200 border border-red-900/40" 
+                                        : "bg-green-900/60 text-green-200 border border-green-900/40"
+                                    }`}>
+                                      {character.status}
+                                    </div>
+                                  </div>
                                 </div>
+                                
+                                <Button 
+                                  className="w-full mb-2"
+                                  onClick={() => handleStartChat(character)}
+                                  disabled={character.status === "Fallecido"}
+                                >
+                                  <MessageSquare className="h-4 w-4 mr-2" />
+                                  {character.status === "Fallecido" 
+                                    ? "No disponible" 
+                                    : "Iniciar conversación"}
+                                </Button>
+                                
+                                {character.status === "Fallecido" && (
+                                  <p className="text-xs text-gray-400 text-center">
+                                    Este personaje no está disponible para interrogatorio
+                                  </p>
+                                )}
                               </div>
                               
                               <div className="md:col-span-2">
-                                <h3 className="text-lg font-semibold mb-2">Antecedentes</h3>
-                                <p className="text-gray-300 mb-4">{character.background}</p>
-                                
-                                <h3 className="text-lg font-semibold mb-2">Detalles</h3>
-                                <div className="space-y-2 mb-4">
-                                  {character.details.map((detail, idx) => (
-                                    <div key={idx} className="flex justify-between border-b border-detective-light pb-2">
-                                      <span className="text-gray-400">{detail.label}:</span>
-                                      <span className="text-white">{detail.value}</span>
-                                    </div>
-                                  ))}
+                                <div className="p-4 bg-detective-dark/30 rounded-lg border border-detective-light/30 mb-4">
+                                  <h3 className="text-lg font-semibold mb-2 flex items-center">
+                                    <Paperclip className="h-4 w-4 mr-2 text-crimson" />
+                                    Antecedentes
+                                  </h3>
+                                  <p className="text-gray-300">{character.background}</p>
                                 </div>
                                 
-                                <h3 className="text-lg font-semibold mb-2">Notas</h3>
-                                <p className="text-gray-300">{character.notes}</p>
+                                <div className="p-4 bg-detective-dark/30 rounded-lg border border-detective-light/30 mb-4">
+                                  <h3 className="text-lg font-semibold mb-2 flex items-center">
+                                    <FileText className="h-4 w-4 mr-2 text-crimson" />
+                                    Detalles
+                                  </h3>
+                                  <div className="space-y-2">
+                                    {character.details.map((detail, idx) => (
+                                      <div key={idx} className="flex justify-between border-b border-detective-light/30 pb-2">
+                                        <span className="text-gray-400">{detail.label}:</span>
+                                        <span className="text-white font-medium">{detail.value}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                                
+                                <div className="p-4 bg-detective-dark/30 rounded-lg border border-detective-light/30">
+                                  <h3 className="text-lg font-semibold mb-2 flex items-center">
+                                    <Bookmark className="h-4 w-4 mr-2 text-crimson" />
+                                    Notas
+                                  </h3>
+                                  <p className="text-gray-300 italic">{character.notes}</p>
+                                </div>
                               </div>
                             </div>
                           </DialogContent>
@@ -1036,25 +1108,27 @@ const Investigacion = () => {
                         <Button 
                           variant="outline" 
                           size="sm"
+                          className="bg-detective-dark/40 hover:bg-detective-dark/80"
                           onClick={() => handleStartChat(character)}
+                          disabled={character.status === "Fallecido"}
                         >
                           <MessageSquare className="h-4 w-4 mr-2" />
                           Hablar
                         </Button>
                       </div>
-                    </div>
+                    </CardContent>
                   </Card>
                 ))}
               </div>
               
               {/* Chat dialog for character conversations */}
               <Dialog open={showChatDialog} onOpenChange={setShowChatDialog}>
-                <DialogContent className="sm:max-w-lg">
+                <DialogContent className="sm:max-w-lg bg-gradient-to-b from-detective-dark to-detective-medium border-detective-light/50">
                   <DialogHeader>
                     <DialogTitle>
                       {selectedCharacter && (
                         <div className="flex items-center">
-                          <div className="w-8 h-8 bg-detective-dark rounded-full flex items-center justify-center text-sm font-bold text-white mr-2">
+                          <div className="w-8 h-8 bg-gradient-to-br from-crimson/60 to-detective-dark rounded-full flex items-center justify-center text-sm font-bold text-white mr-2 shadow-inner">
                             {selectedCharacter.name
                               .split(" ")
                               .map((n) => n[0])
@@ -1070,7 +1144,7 @@ const Investigacion = () => {
                   </DialogHeader>
                   
                   <div className="flex flex-col h-[400px]">
-                    <div className="flex-grow overflow-auto p-4 space-y-4 bg-detective-dark/50 rounded-md mb-4">
+                    <div className="flex-grow overflow-auto p-4 space-y-4 bg-detective-dark/50 rounded-md mb-4 border border-detective-light/30">
                       {chatMessages.map((msg, idx) => {
                         if (msg.sender === "system") {
                           return (
@@ -1081,7 +1155,7 @@ const Investigacion = () => {
                         } else if (msg.sender === "user") {
                           return (
                             <div key={idx} className="flex justify-end">
-                              <div className="bg-blue-600/70 py-2 px-4 rounded-lg text-white max-w-[80%]">
+                              <div className="bg-crimson/70 py-2 px-4 rounded-lg text-white max-w-[80%] shadow-md">
                                 {msg.text}
                               </div>
                             </div>
@@ -1089,7 +1163,7 @@ const Investigacion = () => {
                         } else {
                           return (
                             <div key={idx} className="flex justify-start">
-                              <div className="bg-detective-medium py-2 px-4 rounded-lg text-white max-w-[80%]">
+                              <div className="bg-detective-medium/90 py-2 px-4 rounded-lg text-white max-w-[80%] shadow-md">
                                 {msg.text}
                               </div>
                             </div>
@@ -1103,14 +1177,14 @@ const Investigacion = () => {
                         value={messageInput}
                         onChange={(e) => setMessageInput(e.target.value)}
                         placeholder="Escribe un mensaje..."
-                        className="flex-grow mr-2"
+                        className="flex-grow mr-2 bg-detective-dark/50 border-detective-light/30"
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
                             handleSendMessage();
                           }
                         }}
                       />
-                      <Button onClick={handleSendMessage}>
+                      <Button onClick={handleSendMessage} className="bg-crimson hover:bg-crimson-dark">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           width="24"
@@ -1134,9 +1208,10 @@ const Investigacion = () => {
             </TabsContent>
 
             {/* News Tab */}
-            <TabsContent value="noticias" className="mt-6">
+            <TabsContent value="noticias" className="mt-6 animate-fade-in">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-white">
+                <h2 className="text-xl font-bold text-white flex items-center">
+                  <Newspaper className="h-5 w-5 mr-2 text-crimson" />
                   Cobertura Mediática
                 </h2>
               </div>
@@ -1145,15 +1220,16 @@ const Investigacion = () => {
                 {caseData.news.map((article) => (
                   <div
                     key={article.id}
-                    className="bg-detective-medium rounded-lg border border-detective-light overflow-hidden"
+                    className="bg-detective-medium/70 rounded-lg border border-detective-light/50 overflow-hidden shadow-md hover:shadow-xl transition-all group"
                   >
                     <div className="md:flex">
-                      <div className="md:w-1/3">
+                      <div className="md:w-1/3 relative overflow-hidden">
                         <img
                           src={article.imageUrl}
                           alt={article.title}
-                          className="w-full h-full object-cover md:h-64"
+                          className="w-full h-full object-cover md:h-64 transition-transform duration-700 group-hover:scale-110"
                         />
+                        <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent md:bg-gradient-to-t"></div>
                       </div>
                       <div className="p-6 md:w-2/3">
                         <div className="flex justify-between items-start mb-4">
@@ -1162,11 +1238,11 @@ const Investigacion = () => {
                               {article.title}
                             </h3>
                             <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-gray-400 mt-1">
-                              <div className="flex items-center">
+                              <div className="flex items-center bg-detective-dark/50 px-2 py-0.5 rounded-full">
                                 <span>{article.source}</span>
                               </div>
-                              <div className="flex items-center">
-                                <Calendar className="h-4 w-4 mr-1" />
+                              <div className="flex items-center bg-detective-dark/50 px-2 py-0.5 rounded-full">
+                                <Calendar className="h-3 w-3 mr-1" />
                                 <span>{article.date}</span>
                               </div>
                             </div>
@@ -1174,7 +1250,7 @@ const Investigacion = () => {
 
                           <Dialog>
                             <DialogTrigger asChild>
-                              <Button variant="outline" size="sm">
+                              <Button variant="outline" size="sm" className="bg-detective-dark/40 hover:bg-detective-dark/80">
                                 <ExternalLink className="h-4 w-4 mr-2" />
                                 Leer
                               </Button>
@@ -1187,12 +1263,19 @@ const Investigacion = () => {
                                 </DialogDescription>
                               </DialogHeader>
                               <div className="mt-4">
-                                <img
-                                  src={article.imageUrl}
-                                  alt={article.title}
-                                  className="w-full h-auto rounded-lg mb-6"
-                                />
-                                <div className="prose prose-invert max-w-none">
+                                <div className="relative rounded-lg overflow-hidden mb-6 shadow-lg">
+                                  <img
+                                    src={article.imageUrl}
+                                    alt={article.title}
+                                    className="w-full h-auto"
+                                  />
+                                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+                                    <div className="text-white text-sm font-medium">
+                                      {article.source} | Fotografía
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="prose prose-invert max-w-none p-4 bg-detective-dark/30 rounded-lg border border-detective-light/30">
                                   <p className="text-gray-300 whitespace-pre-line">
                                     {article.content}
                                   </p>
@@ -1202,6 +1285,7 @@ const Investigacion = () => {
                                     <Button
                                       variant="outline"
                                       size="sm"
+                                      className="bg-detective-dark/40 hover:bg-detective-dark/80"
                                       asChild
                                     >
                                       <a
@@ -1220,7 +1304,7 @@ const Investigacion = () => {
                           </Dialog>
                         </div>
 
-                        <p className="text-gray-400 text-sm mb-4">
+                        <p className="text-gray-300 text-sm mb-4 line-clamp-3">
                           {article.excerpt}
                         </p>
                       </div>
@@ -1231,42 +1315,55 @@ const Investigacion = () => {
             </TabsContent>
 
             {/* Interrogation Tab */}
-            <TabsContent value="interrogatorio" className="mt-6">
-              <div className="bg-detective-medium rounded-lg border border-detective-light p-6 mb-6">
-                <h2 className="text-xl font-bold text-white mb-4">
-                  Módulo de Interrogatorio Inteligente
-                </h2>
-                <p className="text-gray-300">
-                  Utilice esta herramienta para analizar patrones y generar preguntas inteligentes para sus interrogatorios. Seleccione un personaje para comenzar.
-                </p>
+            <TabsContent value="interrogatorio" className="mt-6 animate-fade-in">
+              <div className="bg-detective-medium/70 rounded-lg border border-detective-light/50 p-6 mb-6 shadow-md">
+                <div className="flex items-start gap-4">
+                  <div className="bg-crimson/10 rounded-full p-2">
+                    <AlertTriangle className="h-6 w-6 text-crimson" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-white mb-2">
+                      Módulo de Interrogatorio Inteligente
+                    </h2>
+                    <p className="text-gray-300">
+                      Esta herramienta analiza patrones, comportamiento y evidencias para generar preguntas estratégicas que ayuden a revelar información crucial. Seleccione un personaje para comenzar.
+                    </p>
+                  </div>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-detective-medium rounded-lg border border-detective-light p-6">
-                  <h3 className="text-lg font-bold text-white mb-4">
+                <div className="bg-detective-medium/70 rounded-lg border border-detective-light/50 p-6 shadow-md">
+                  <h3 className="text-lg font-bold text-white mb-4 flex items-center">
+                    <User className="h-4 w-4 mr-2 text-crimson" />
                     Seleccionar Personaje
                   </h3>
                   <div className="space-y-4">
                     {caseData.characters.map((character) => (
                       <div
                         key={character.id}
-                        className={`p-4 rounded-lg cursor-pointer transition-colors ${
+                        className={`p-4 rounded-lg cursor-pointer transition-all ${
                           selectedCharacter?.id === character.id
-                            ? "bg-crimson/20 border border-crimson/50"
+                            ? "bg-gradient-to-r from-crimson/20 to-detective-dark border border-crimson/40 shadow-md"
                             : "bg-detective-dark hover:bg-detective-dark/70"
                         }`}
                         onClick={() => handleCharacterSelect(character)}
                       >
                         <div className="flex items-center">
-                          <div className="w-10 h-10 bg-detective-dark rounded-full flex items-center justify-center text-sm font-bold text-white mr-3">
+                          <div className="w-10 h-10 bg-gradient-to-br from-crimson/60 to-detective-dark rounded-full flex items-center justify-center text-sm font-bold text-white mr-3 shadow-inner">
                             {character.name
                               .split(" ")
                               .map((n) => n[0])
                               .join("")}
                           </div>
                           <div>
-                            <h4 className="font-medium text-white">
+                            <h4 className="font-medium text-white flex items-center">
                               {character.name}
+                              {character.status === "Fallecido" && (
+                                <span className="ml-2 bg-red-900/40 text-red-200 text-xs px-1.5 py-0.5 rounded-full">
+                                  Fallecido
+                                </span>
+                              )}
                             </h4>
                             <p className="text-sm text-gray-400">
                               {character.role}
@@ -1278,44 +1375,56 @@ const Investigacion = () => {
                   </div>
                 </div>
 
-                <div className="bg-detective-medium rounded-lg border border-detective-light p-6">
-                  <h3 className="text-lg font-bold text-white mb-4">
+                <div className="bg-detective-medium/70 rounded-lg border border-detective-light/50 p-6 shadow-md">
+                  <h3 className="text-lg font-bold text-white mb-4 flex items-center">
+                    <Coffee className="h-4 w-4 mr-2 text-crimson" />
                     Preguntas Sugeridas
                   </h3>
                   {selectedCharacter ? (
                     <div className="space-y-3">
                       <p className="text-gray-300 mb-4">
-                        Preguntas generadas para {selectedCharacter.name}:
+                        Basado en evidencias, perfiles psicológicos y patrones de caso, considere las siguientes preguntas para {selectedCharacter.name}:
                       </p>
-                      <div className="p-3 bg-detective-dark rounded-md hover:bg-detective-dark/80 cursor-pointer">
+                      <div className="p-3 bg-detective-dark rounded-md hover:bg-detective-dark/80 cursor-pointer border border-detective-light/30 transition-all">
                         <p className="text-white">¿Cuál es su relación con la mansión Blackwood?</p>
                       </div>
-                      <div className="p-3 bg-detective-dark rounded-md hover:bg-detective-dark/80 cursor-pointer">
+                      <div className="p-3 bg-detective-dark rounded-md hover:bg-detective-dark/80 cursor-pointer border border-detective-light/30 transition-all">
                         <p className="text-white">¿Conocía a la víctima? ¿Cómo describiría su relación?</p>
                       </div>
-                      <div className="p-3 bg-detective-dark rounded-md hover:bg-detective-dark/80 cursor-pointer">
+                      <div className="p-3 bg-detective-dark rounded-md hover:bg-detective-dark/80 cursor-pointer border border-detective-light/30 transition-all">
                         <p className="text-white">¿Dónde estaba usted la noche del incidente?</p>
                       </div>
-                      <div className="p-3 bg-detective-dark rounded-md hover:bg-detective-dark/80 cursor-pointer">
+                      <div className="p-3 bg-detective-dark rounded-md hover:bg-detective-dark/80 cursor-pointer border border-detective-light/30 transition-all">
                         <p className="text-white">¿Hay algo inusual que haya notado recientemente?</p>
                       </div>
                       <Button 
-                        className="w-full mt-4"
+                        className="w-full mt-4 bg-gradient-to-r from-crimson to-crimson-dark shadow-md hover:shadow-lg transition-all"
                         onClick={() => {
                           if (selectedCharacter) {
                             handleStartChat(selectedCharacter);
                           }
                         }}
+                        disabled={selectedCharacter.status === "Fallecido"}
                       >
                         <MessageSquare className="mr-2 h-4 w-4" />
-                        Iniciar Interrogatorio
+                        {selectedCharacter.status === "Fallecido" 
+                          ? "Personaje no disponible" 
+                          : "Iniciar Interrogatorio"}
                       </Button>
+                      {selectedCharacter.status === "Fallecido" && (
+                        <p className="text-xs text-gray-400 text-center mt-2">
+                          Este personaje no está disponible para interrogatorio
+                        </p>
+                      )}
                     </div>
                   ) : (
                     <div className="flex items-center justify-center h-48 bg-detective-dark rounded-lg">
-                      <p className="text-gray-500">
-                        Seleccione un personaje para ver preguntas sugeridas
-                      </p>
+                      <div className="text-center">
+                        <Search className="h-10 w-10 text-gray-500 mx-auto mb-3 opacity-50" />
+                        <p className="text-gray-500">
+                          Seleccione un personaje para ver preguntas sugeridas
+                        </p>
+                      </div>
                     </div>
                   )}
                 </div>
