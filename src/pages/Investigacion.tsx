@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import AppLayout from "@/components/AppLayout";
@@ -870,4 +871,95 @@ const Investigacion = () => {
                           </DialogHeader>
 
                           {article.imageUrl && (
-                            <div
+                            <div className="mt-4 mb-6">
+                              <img
+                                src={article.imageUrl}
+                                alt={article.title}
+                                className="w-full h-auto rounded-md"
+                              />
+                            </div>
+                          )}
+
+                          <div className="prose prose-invert max-w-none">
+                            <p className="text-gray-300 whitespace-pre-line">
+                              {article.content}
+                            </p>
+                          </div>
+
+                          {article.pdfUrl && (
+                            <div className="mt-6">
+                              <Button variant="outline" asChild>
+                                <a
+                                  href={article.pdfUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  <FileText className="h-4 w-4 mr-2" />
+                                  Ver PDF original
+                                </a>
+                              </Button>
+                            </div>
+                          )}
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+
+            {/* Interrogation Tab */}
+            <TabsContent value="interrogatorio" className="mt-6">
+              <div className="bg-detective-medium rounded-lg border border-detective-light p-6 mb-6">
+                <h2 className="text-xl font-bold text-white mb-4">
+                  Asistente de Investigación
+                </h2>
+                <p className="text-gray-300 mb-4">
+                  Utiliza el asistente para analizar pruebas, generar hipótesis o
+                  solicitar información adicional sobre el caso.
+                </p>
+                
+                <div className="mt-4 border border-detective-light rounded-lg overflow-hidden">
+                  <div className="bg-detective-medium p-4">
+                    <div className="flex flex-col space-y-4">
+                      <div className="flex items-start">
+                        <div className="bg-detective-light p-3 rounded-lg max-w-[80%]">
+                          <p className="text-white">
+                            ¿Qué puedo hacer para avanzar en la investigación del caso?
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start justify-end">
+                        <div className="bg-crimson p-3 rounded-lg max-w-[80%]">
+                          <p className="text-white">
+                            Basado en las evidencias recolectadas, recomendaría analizar en detalle el informe toxicológico y buscar conexiones con la historia personal de Victor Blackwood, quien era toxicólogo. La nota encontrada en el bolsillo de la víctima sugiere una reunión planificada. Deberías investigar quién es "M" y qué relación podría tener con la propiedad.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="p-4 bg-detective-dark">
+                    <div className="flex items-center">
+                      <Textarea 
+                        placeholder="Escribe tu consulta aquí..." 
+                        className="resize-none bg-detective-medium border-detective-light"
+                      />
+                      <Button className="ml-2 bg-crimson hover:bg-crimson-dark">
+                        Enviar
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
+    </AppLayout>
+  );
+};
+
+export default Investigacion;
+
