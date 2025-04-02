@@ -423,74 +423,50 @@ const AddEvidenceForm = ({ onClose }) => {
         )}
 
         {form.watch("type") === "image" && (
-          <FormField
-            control={form.control}
-            name="imageUrl"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>URL de la imagen</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="https://ejemplo.com/imagen.jpg"
-                    {...field}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
+          <div className="space-y-4">
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <FormLabel htmlFor="imageUrl">URL de la imagen</FormLabel>
+              <Input
+                id="imageUrl"
+                placeholder="https://ejemplo.com/imagen.jpg"
+                onChange={(e) => form.setValue("content", e.target.value)}
+              />
+            </div>
+          </div>
         )}
 
         {form.watch("type") === "pdf" && (
-          <FormField
-            control={form.control}
-            name="pdfUrl"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>URL del PDF</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="https://ejemplo.com/documento.pdf"
-                    {...field}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
+          <div className="space-y-4">
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <FormLabel htmlFor="pdfUrl">URL del PDF</FormLabel>
+              <Input
+                id="pdfUrl"
+                placeholder="https://ejemplo.com/documento.pdf"
+                onChange={(e) => form.setValue("content", e.target.value)}
+              />
+            </div>
+          </div>
         )}
 
         {form.watch("type") === "video" && (
-          <>
-            <FormField
-              control={form.control}
-              name="videoUrl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>URL del video</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="https://ejemplo.com/video.mp4"
-                      {...field}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="thumbnailUrl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>URL de la miniatura</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="https://ejemplo.com/thumbnail.jpg"
-                      {...field}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-          </>
+          <div className="space-y-4">
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <FormLabel htmlFor="videoUrl">URL del video</FormLabel>
+              <Input
+                id="videoUrl"
+                placeholder="https://ejemplo.com/video.mp4"
+                onChange={(e) => form.setValue("content", e.target.value)}
+              />
+            </div>
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <FormLabel htmlFor="thumbnailUrl">URL de la miniatura</FormLabel>
+              <Input
+                id="thumbnailUrl"
+                placeholder="https://ejemplo.com/thumbnail.jpg"
+                onChange={(e) => form.setValue("description", e.target.value)}
+              />
+            </div>
+          </div>
         )}
 
         <div className="flex justify-end space-x-2 pt-4">
@@ -894,94 +870,4 @@ const Investigacion = () => {
                           </DialogHeader>
 
                           {article.imageUrl && (
-                            <div className="mt-4 mb-6">
-                              <img
-                                src={article.imageUrl}
-                                alt={article.title}
-                                className="w-full h-auto rounded-md"
-                              />
-                            </div>
-                          )}
-
-                          <div className="prose prose-invert max-w-none">
-                            <p className="whitespace-pre-line">
-                              {article.content}
-                            </p>
-                          </div>
-
-                          {article.pdfUrl && (
-                            <div className="mt-6 pt-6 border-t border-detective-light">
-                              <div className="flex items-center">
-                                <FileText className="h-6 w-6 text-crimson mr-3" />
-                                <div className="flex-1">
-                                  <h4 className="text-white font-medium">
-                                    Artículo original en PDF
-                                  </h4>
-                                </div>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="ml-2"
-                                  asChild
-                                >
-                                  <a
-                                    href={article.pdfUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                  >
-                                    <ExternalLink className="h-4 w-4 mr-2" />{" "}
-                                    Ver
-                                  </a>
-                                </Button>
-                              </div>
-                            </div>
-                          )}
-                        </DialogContent>
-                      </Dialog>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </TabsContent>
-
-            {/* Interrogation Tab (Placeholder for chatbot) */}
-            <TabsContent value="interrogatorio" className="mt-6">
-              <div className="bg-detective-medium rounded-lg border border-detective-light p-6 text-center">
-                <h2 className="text-xl font-bold text-white mb-4">
-                  Interrogatorio Virtual
-                </h2>
-                <p className="text-gray-300 mb-6">
-                  Esta función permite interrogar a sospechosos y testigos
-                  mediante un sistema de chatbot inteligente. El chatbot
-                  responderá basándose en la personalidad y conocimientos de
-                  cada personaje.
-                </p>
-                <div className="bg-detective-dark rounded-lg border border-detective-light p-8 max-w-2xl mx-auto">
-                  <p className="text-gray-400 mb-4">
-                    Selecciona un personaje para interrogar:
-                  </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                    {caseData.testimonies.map((testimony) => (
-                      <Button
-                        key={testimony.id}
-                        variant="outline"
-                        className="border-detective-light text-white hover:bg-detective-light/10"
-                      >
-                        {testimony.name} ({testimony.role})
-                      </Button>
-                    ))}
-                  </div>
-                  <p className="text-gray-400 text-sm italic">
-                    Esta función estará disponible próximamente.
-                  </p>
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </div>
-      </div>
-    </AppLayout>
-  );
-};
-
-export default Investigacion;
+                            <div
